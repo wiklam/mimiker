@@ -1,19 +1,11 @@
 #ifndef _SYS_PMAP_H_
 #define _SYS_PMAP_H_
 
+#include <stdbool.h>
 #include <sys/vm.h>
-#include <sys/queue.h>
-#include <sys/exception.h>
-#include <sys/mutex.h>
-#include <machine/pmap.h>
 
-typedef struct pmap {
-  pte_t *pde;              /* directory page table */
-  vm_page_t *pde_page;     /* pointer to a page with directory page table */
-  vm_pagelist_t pte_pages; /* pages we allocate in page table */
-  asid_t asid;
-  mtx_t mtx;
-} pmap_t;
+typedef struct pmap pmap_t;
+typedef struct exc_frame exc_frame_t;
 
 bool pmap_address_p(pmap_t *pmap, vaddr_t va);
 bool pmap_contains_p(pmap_t *pmap, vaddr_t start, vaddr_t end);

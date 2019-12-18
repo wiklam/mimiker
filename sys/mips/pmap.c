@@ -16,8 +16,17 @@
 #include <sys/mutex.h>
 #include <sys/sched.h>
 #include <sys/sysinit.h>
+#include <sys/vm.h>
 #include <sys/vm_physmem.h>
 #include <bitstring.h>
+
+struct pmap {
+  pte_t *pde;              /* directory page table */
+  vm_page_t *pde_page;     /* pointer to a page with directory page table */
+  vm_pagelist_t pte_pages; /* pages we allocate in page table */
+  asid_t asid;
+  mtx_t mtx;
+};
 
 static POOL_DEFINE(P_PMAP, "pmap", sizeof(pmap_t));
 
