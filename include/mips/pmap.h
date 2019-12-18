@@ -19,10 +19,14 @@
 #define PT_ENTRIES 1024 /* page table entries */
 #define PT_SIZE (PT_ENTRIES * PTE_SIZE)
 
+/* Base address of all user and kernel page table entries
+ * must begin at 4MiB boundary since we want to use only one PDE to map it. */
+#define PT_BASE 0xff800000
+
 /* Base addresses of active user and kernel page directory tables.
  * UPD_BASE must begin at 8KiB boundary. */
-#define UPD_BASE (PMAP_KERNEL_END + PD_SIZE * 0)
-#define KPD_BASE (PMAP_KERNEL_END + PD_SIZE * 1)
+#define UPD_BASE 0xffffe000
+#define KPD_BASE 0xfffff000
 
 #ifndef __ASSEMBLER__
 void *pmap_kseg2_to_kseg0(void *va);
@@ -37,10 +41,5 @@ typedef uint8_t asid_t;
 typedef uint32_t pte_t;
 typedef uint32_t pde_t;
 #endif /* __ASSEMBLER__ */
-
-#define PMAP_KERNEL_BEGIN 0xc0000000 /* kseg2 & kseg3 */
-#define PMAP_KERNEL_END 0xffffe000
-#define PMAP_USER_BEGIN 0x00001000
-#define PMAP_USER_END 0x80000000
 
 #endif /* !_MIPS_PMAP_H_ */

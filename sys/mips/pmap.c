@@ -33,19 +33,19 @@ static bool is_valid(pte_t pte) {
 }
 
 static bool user_addr_p(vaddr_t addr) {
-  return (addr >= PMAP_USER_BEGIN) && (addr < PMAP_USER_END);
+  return (addr >= USER_SPACE_BEGIN) && (addr < USER_SPACE_END);
 }
 
 static bool kern_addr_p(vaddr_t addr) {
-  return (addr >= PMAP_KERNEL_BEGIN) && (addr < PMAP_KERNEL_END);
+  return (addr >= KERNEL_SPACE_BEGIN) && (addr < KERNEL_SPACE_END);
 }
 
 vaddr_t pmap_start(pmap_t *pmap) {
-  return pmap->asid ? PMAP_USER_BEGIN : PMAP_KERNEL_BEGIN;
+  return pmap->asid ? USER_SPACE_BEGIN : KERNEL_SPACE_BEGIN;
 }
 
 vaddr_t pmap_end(pmap_t *pmap) {
-  return pmap->asid ? PMAP_USER_END : PMAP_KERNEL_END;
+  return pmap->asid ? USER_SPACE_END : KERNEL_SPACE_END;
 }
 
 bool pmap_address_p(pmap_t *pmap, vaddr_t va) {
