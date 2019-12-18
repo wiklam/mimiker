@@ -43,36 +43,6 @@ typedef enum {
 #define KL_LOG KL_UNDEF
 #endif
 
-#ifdef _KLOG_PRIVATE
-#undef _KLOG_PRIVATE
-
-#include <sys/time.h>
-
-#define KL_SIZE 1024
-
-typedef struct klog_entry {
-  timeval_t kl_timestamp;
-  tid_t kl_tid;
-  unsigned kl_line;
-  const char *kl_file;
-  klog_origin_t kl_origin;
-  const char *kl_format;
-  uintptr_t kl_params[6];
-} klog_entry_t;
-
-typedef struct klog {
-  klog_entry_t array[KL_SIZE];
-  unsigned mask;
-  bool verbose;
-  volatile unsigned first;
-  volatile unsigned last;
-  bool repeated;
-  int prev;
-} klog_t;
-
-extern klog_t klog;
-#endif
-
 void klog_init(void);
 
 void klog_append(klog_origin_t origin, const char *file, unsigned line,

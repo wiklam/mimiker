@@ -4,8 +4,30 @@
 #include <sys/time.h>
 #include <sys/libkern.h>
 #include <sys/thread.h>
-#define _KLOG_PRIVATE
+#include <sys/time.h>
 #include <sys/klog.h>
+
+#define KL_SIZE 1024
+
+typedef struct klog_entry {
+  timeval_t kl_timestamp;
+  tid_t kl_tid;
+  unsigned kl_line;
+  const char *kl_file;
+  klog_origin_t kl_origin;
+  const char *kl_format;
+  uintptr_t kl_params[6];
+} klog_entry_t;
+
+typedef struct klog {
+  klog_entry_t array[KL_SIZE];
+  unsigned mask;
+  bool verbose;
+  volatile unsigned first;
+  volatile unsigned last;
+  bool repeated;
+  int prev;
+} klog_t;
 
 klog_t klog;
 
