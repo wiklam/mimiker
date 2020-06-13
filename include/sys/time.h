@@ -47,6 +47,8 @@ typedef struct bintime {
     .sec = 0, .frac = ((1ULL << 63) / (hz)) << 1                               \
   }
 
+systime_t ts2hz(timespec_t *ts);
+
 /* Returns seconds after EPOCH */
 time_t tm2sec(tm_t *tm);
 
@@ -157,8 +159,8 @@ struct itimerval {
   struct timeval it_value;    /* current value */
 };
 
-#define TIMER_RELTIME   0 /* relative timer */
-#define TIMER_ABSTIME   1 /* absolute timer */
+#define TIMER_RELTIME 0 /* relative timer */
+#define TIMER_ABSTIME 1 /* absolute timer */
 
 #ifdef _KERNEL
 
