@@ -539,7 +539,7 @@ static int sys_clock_nanosleep(proc_t *p, clock_nanosleep_args_t *args,
     return 0;
   }
 
-  error = do_clock_nanosleep(clock_id, flags, &rqtp, &rmtp);
+  error = do_clock_nanosleep(clock_id, flags, &rqtp, u_rmtp ? &rmtp : NULL);
 
   if ((u_rmtp != NULL && (error == 0 || error == EINTR)) &&
       (flags & TIMER_ABSTIME) == 0 && (error2 = copyout_s(rmtp, u_rmtp)))
