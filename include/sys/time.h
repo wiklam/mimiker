@@ -157,6 +157,9 @@ struct itimerval {
   struct timeval it_value;    /* current value */
 };
 
+#define TIMER_RELTIME   0 /* relative timer */
+#define TIMER_ABSTIME   1 /* absolute timer */
+
 #ifdef _KERNEL
 
 /* Time measured from the start of system. */
