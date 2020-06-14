@@ -3,7 +3,7 @@
 
 #include <sys/types.h>
 
-#define CLK_TCK 100 /* system clock ticks per second */
+#define CLK_TCK 1000 /* system clock ticks per second */
 
 typedef struct tm {
   int tm_sec;          /* seconds after the minute [0-61] */

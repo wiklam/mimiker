@@ -2,6 +2,7 @@
 #include <sys/sleepq.h>
 #include <sys/time.h>
 #include <limits.h>
+#include <sys/libkern.h>
 
 int do_clock_gettime(clockid_t clk, timespec_t *tp) {
   bintime_t bin;
@@ -21,16 +22,20 @@ int do_clock_gettime(clockid_t clk, timespec_t *tp) {
 
 systime_t ts2hz(timespec_t *ts) {
   int64_t sec = ts->tv_sec;
-  int ticks;
+  systime_t ticks;
+  u_int extck = 0;
+  long check;
 
-  if (sec < INT_MAX / CLK_TCK) {
+  if (sec < UINT_MAX / CLK_TCK) {
     ticks = sec * CLK_TCK;
-    if (ticks <= INT_MAX - ts->tv_nsec / (1000000000 / CLK_TCK))
-      ticks += ts->tv_nsec / (1000000000 / CLK_TCK);
-    else
-      ticks = INT_MAX;
+    check = ts->tv_nsec / (1000000000 / CLK_TCK);
+    extck = ((uint64_t)check * 1000000000 < (uint64_t)ts->tv_nsec * CLK_TCK);
+    if (ticks <= UINT_MAX - check - extck) {
+      ticks += check + extck;
+    } else
+      ticks = UINT_MAX;
   } else
-    ticks = INT_MAX;
+    ticks = UINT_MAX;
 
   return ticks;
 }
@@ -47,15 +52,13 @@ static int ts2timo(clockid_t clock_id, int flags, timespec_t *ts,
   if ((error = do_clock_gettime(clock_id, start)) != 0)
     return error;
 
-  if (flags & TIMER_ABSTIME)
+  if (flags == TIMER_ABSTIME)
     timespecsub(ts, start, ts);
 
   if ((ts->tv_sec == 0 && ts->tv_nsec == 0) || ts->tv_sec < 0)
     return ETIMEDOUT;
 
-  *timo = ts2hz(ts);
-  if (*timo == 0)
-    *timo = 1;
+  *timo = ts2hz(ts) + 1;
 
   return 0;
 }
