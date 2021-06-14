@@ -2,6 +2,7 @@
 #include <sys/context.h>
 #include <sys/gmon.h>
 #include <sys/kmem.h>
+#include <sys/timer.h>
 #include <sys/thread.h>
 #include <machine/vm_param.h>
 
@@ -64,4 +65,15 @@ void kgprof_tick(void) {
       g->kcount[instr]++;
     }
   }
+}
+
+void kgprof_set_profrate(int profrate) {
+  _gmonhdr.profrate = profrate;
+}
+
+timer_t *stat_timer_get(void) {
+  timer_t * tm = tm_reserve(NULL, TMF_PERIODIC);
+  if(tm)
+    _gmonhdr.profrate = STAT_TCK;
+  return tm;
 }
