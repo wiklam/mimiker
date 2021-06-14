@@ -7,7 +7,7 @@
 #include <sys/kgprof.h>
 
 static systime_t now = 0;
-static timer_t *clock = NULL;
+static timer_t *sysclock = NULL;
 
 systime_t getsystime(void) {
   return now;
@@ -26,12 +26,12 @@ static void clock_cb(timer_t *tm, void *arg) {
 }
 
 void init_clock(void) {
-  clock = tm_reserve(NULL, TMF_PERIODIC);
-  if (clock == NULL)
+  sysclock = tm_reserve(NULL, TMF_PERIODIC);
+  if (sysclock == NULL)
     panic("Missing suitable timer for maintenance of system clock!");
-  tm_init(clock, clock_cb, NULL);
-  if (tm_start(clock, TMF_PERIODIC | TMF_TIMESOURCE, (bintime_t){},
+  tm_init(sysclock, clock_cb, NULL);
+  if (tm_start(sysclock, TMF_PERIODIC | TMF_TIMESOURCE, (bintime_t){},
                HZ2BT(CLK_TCK)))
     panic("Failed to start system clock!");
-  klog("System clock uses \'%s\' hardware timer.", clock->tm_name);
+  klog("System clock uses \'%s\' hardware timer.", sysclock->tm_name);
 }
