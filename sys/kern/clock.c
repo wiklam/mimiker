@@ -41,13 +41,7 @@ void init_clock(void) {
 
   if (stat_tm != NULL) {
     tm_init(stat_tm, stat_clock, NULL);
-    if (tm_start(stat_tm, TMF_PERIODIC, (bintime_t){}, HZ2BT(STAT_TCK))) {
-      klog("Failed to start statclock, using system clock instead!");
-      tm_release(stat_tm);
-      stat_tm = NULL;
-    } else {
-      kgprof_set_profrate(STAT_TCK);
-      klog("Statclock uses \'%s\' hardware timer.", stat_tm->tm_name);
-    }
+    kgprof_set_profrate(STAT_TCK);
+    klog("Statclock uses \'%s\' hardware timer.", stat_tm->tm_name);
   }
 }

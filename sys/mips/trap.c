@@ -10,6 +10,7 @@
 #include <sys/thread.h>
 #include <sys/vm_map.h>
 #include <sys/vm_physmem.h>
+#include <sys/kgprof.h>
 
 __no_profile static inline unsigned exc_code(ctx_t *ctx) {
   return (_REG(ctx, CAUSE) & CR_X_MASK) >> CR_X_SHIFT;
@@ -54,7 +55,6 @@ static void syscall_handler(ctx_t *ctx, syscall_result_t *result) {
   register_t retval = 0;
 
   assert(td->td_proc != NULL);
-
   if (!error)
     error = se->call(td->td_proc, (void *)args, &retval);
 
@@ -260,6 +260,7 @@ __no_profile void mips_exc_handler(ctx_t *ctx) {
   bool user_mode = user_mode_p(ctx);
 
   if (!user_mode) {
+    kgprof_timer_start();
     /* If there's not enough space on the stack to store another exception
      * frame we consider situation to be critical and panic.
      * Hopefully sizeof(ctx_t) bytes of unallocated stack space will be enough
@@ -269,6 +270,7 @@ __no_profile void mips_exc_handler(ctx_t *ctx) {
       panic("Kernel stack overflow caught at $%08lx!", _REG(ctx, EPC));
   }
 
+
   if (exc_code(ctx)) {
     if (user_mode)
       user_trap_handler(ctx);
@@ -277,4 +279,6 @@ __no_profile void mips_exc_handler(ctx_t *ctx) {
   } else {
     intr_root_handler(ctx);
   }
+  if (!user_mode)
+    kgprof_timer_stop();
 }

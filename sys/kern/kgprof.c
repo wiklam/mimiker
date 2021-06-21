@@ -8,6 +8,7 @@
 
 gmonparam_t _gmonparam = {.state = GMON_PROF_NOT_INIT};
 static gmonhdr_t _gmonhdr = {.profrate = CLK_TCK};
+timer_t *stat_tm = NULL;
 
 /* The macros description are provided in gmon.h */
 void init_kgprof(void) {
@@ -72,8 +73,14 @@ void kgprof_set_profrate(int profrate) {
 }
 
 timer_t *stat_timer_get(void) {
-  timer_t * tm = tm_reserve(NULL, TMF_PERIODIC);
-  if(tm)
-    _gmonhdr.profrate = STAT_TCK;
-  return tm;
+  stat_tm = tm_reserve(NULL, TMF_PERIODIC);
+  return stat_tm;
+}
+
+void kgprof_timer_start(void) {
+  assert(0 == tm_start(stat_tm, TMF_PERIODIC, (bintime_t){}, HZ2BT(STAT_TCK)));
+}
+
+void kgprof_timer_stop(void) {
+  assert(0 == tm_stop(stat_tm));
 }
